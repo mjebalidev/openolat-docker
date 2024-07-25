@@ -1,5 +1,5 @@
 # Use postgres/example user/password credentials
-version: '3.1'
+version: "3.1"
 
 volumes:
   postgres-data:
@@ -9,7 +9,6 @@ volumes:
   certbot-www:
 
 services:
-
   postgres:
     build:
       context: postgres
@@ -21,19 +20,19 @@ services:
       POSTGRES_PASSWORD: oodbpasswd
       POSTGRES_DB: oodb
       PGDATA: /var/lib/postgresql/data
-    expose: 
+    expose:
       - 5432
-#    ports:
-#      - 5432:5432
+    ports:
+      - 5432:5432
 
   openolat:
-    build: 
+    build:
       context: openolat
       #args:
-        # - OPENOLAT_URL=$OPENOLAT_URL
-        #- JDK_URL=$JDK_URL
-        #- TOMCAT_URL=$TOMCAT_URL
-        #- OPENOLAT_URL=$OPENOLAT_URL
+      # - OPENOLAT_URL=$OPENOLAT_URL
+      #- JDK_URL=$JDK_URL
+      #- TOMCAT_URL=$TOMCAT_URL
+      #- OPENOLAT_URL=$OPENOLAT_URL
     volumes:
       - openolat-data:/home/openolat/olatdata
       - openolat-logs:/home/openolat/logs
@@ -68,7 +67,7 @@ services:
 
   nginx:
     image: nginx:1.23.4-alpine
-    volumes: 
+    volumes:
       # - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/templates:/etc/nginx/templates:ro
       - certbot-conf:/etc/letsencrypt
@@ -77,7 +76,7 @@ services:
       - openolat
     ports:
       - "80:80"
-      - "443:443"      
+      - "443:443"
     restart: always
     environment:
       - NGINX_HOST=${NGINX_HOST}
@@ -88,16 +87,16 @@ services:
     labels:
       ofelia.enabled: "true"
       ofelia.job-exec.nginx-reload.schedule: "@every 6h"
-      ofelia.job-exec.nginx-reload.command: "nginx -s reload"      
+      ofelia.job-exec.nginx-reload.command: "nginx -s reload"
 
   certbot:
-    image: certbot/certbot      
+    image: certbot/certbot
     volumes:
       - certbot-conf:/etc/letsencrypt
       - certbot-www:/var/www/certbot
     environment:
       - domains=${DOMAINS}
-    command: [ 'renew' ]
+    command: ["renew"]
     labels:
       ofelia.enabled: "true"
       ofelia.job-exec.certbot-renew.schedule: "@every 12h"
